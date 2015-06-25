@@ -14,8 +14,8 @@ Gem::Specification.new do |s|
   s.files         = Dir["lib/**/*.rb"]
   s.require_paths = ["lib"]
 
-  s.add_dependency "bson"
-  s.add_dependency "bson_ext"
-  s.add_dependency "poseidon"
+  s.add_dependency "bson", "~> 1.12.2"
+  s.add_dependency "bson_ext", "~> 1.12.2"
+  s.add_dependency "poseidon", "~> 0.0.5"
   s.add_development_dependency "rake"
 end

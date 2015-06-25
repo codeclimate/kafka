@@ -2,9 +2,9 @@ PATH
   remote: .
   specs:
     kafka (0.0.1)
-      bson
-      bson_ext
-      poseidon
+      bson (~> 1.12.2)
+      bson_ext (~> 1.12.2)
+      poseidon (~> 0.0.5)
 
 GEM
   remote: https://rubygems.org/
