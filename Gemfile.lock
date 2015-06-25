@@ -1,0 +1,41 @@
+PATH
+  remote: .
+  specs:
+    kafka (0.0.1)
+      bson
+      bson_ext
+      poseidon
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    bson (1.12.2)
+    bson_ext (1.12.2)
+      bson (~> 1.12.2)
+    diff-lcs (1.2.5)
+    poseidon (0.0.5)
+    rake (10.4.2)
+    rspec (3.2.0)
+      rspec-core (~> 3.2.0)
+      rspec-expectations (~> 3.2.0)
+      rspec-mocks (~> 3.2.0)
+    rspec-core (3.2.3)
+      rspec-support (~> 3.2.0)
+    rspec-expectations (3.2.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.2.0)
+    rspec-mocks (3.2.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.2.0)
+    rspec-support (3.2.2)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  kafka!
+  rake
+  rspec
+
+BUNDLED WITH
+   1.10.3
