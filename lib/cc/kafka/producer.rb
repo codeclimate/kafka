@@ -14,9 +14,10 @@ module CC
         message = Poseidon::MessageToSend.new(topic, serialized, key)
 
         producer.send_messages([message])
-      rescue => ex
+      rescue
         producer.close
-        raise ex
+
+        raise
       end
 
       def close
