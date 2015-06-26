@@ -26,26 +26,29 @@ module CC::Kafka
 
       it "closes the producer on exceptions" do
         error = RuntimeError.new("boom")
-        poseidon_producer = double("Producer")
+        poseidon_producer = stub_producer
 
         allow(BSON).to receive(:serialize).and_raise(error)
-        expect(poseidon_producer).to receive(:close)
-        expect(Poseidon::Producer).to receive(:new).and_return(poseidon_producer)
 
         producer = Producer.new("a-client-id", "kafka://host:1234/a-topic")
 
+        expect(poseidon_producer).to receive(:close)
         expect { producer.send_message({}) }.to raise_error(error)
       end
     end
 
     describe "#close" do
       it "closes the Poseidon producer" do
-        poseidon_producer = double("Producer")
+        poseidon_producer = stub_producer
 
         expect(poseidon_producer).to receive(:close)
-        expect(Poseidon::Producer).to receive(:new).and_return(poseidon_producer)
-
         Producer.new("a-client-id", "kafka://host:1234/a-topic").close
+      end
+    end
+
+    def stub_producer
+      double("Poseidon::Producer").tap do |producer|
+        allow(Poseidon::Producer).to receive(:new).and_return(producer)
       end
     end
   end
