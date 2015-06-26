@@ -15,7 +15,7 @@ module CC
 
         producer.send_messages([message])
       rescue
-        producer.close
+        close
 
         raise
       end
