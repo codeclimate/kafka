@@ -4,7 +4,6 @@ module CC::Kafka
   describe Consumer do
     before do
       CC::Kafka.offset_model = Offset
-      CC::Kafka.logger = Logger.new(STDOUT)
       CC::Kafka.logger.level = Logger::ERROR
     end
 
