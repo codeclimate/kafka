@@ -49,7 +49,7 @@ module CC
         @consumer.fetch.each do |message|
           @offset.set(current: message.offset + 1)
 
-          Kafka.db.transaction do
+          Kafka.offset_model.transaction do
             @on_message.call(BSON.deserialize(message.value))
           end
         end

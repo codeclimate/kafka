@@ -3,7 +3,6 @@ require "spec_helper"
 module CC::Kafka
   describe Consumer do
     before do
-      CC::Kafka.db = DB.new
       CC::Kafka.offset_model = Offset
       CC::Kafka.logger = Logger.new(STDOUT)
       CC::Kafka.logger.level = Logger::ERROR
@@ -47,13 +46,11 @@ module CC::Kafka
     end
   end
 
-  class DB
-    def transaction
+  Offset = Struct.new(:topic, :partition, :current) do
+    def self.transaction
       yield
     end
-  end
 
-  Offset = Struct.new(:topic, :partition, :current) do
     def self.find_or_create!(attrs)
       @offset ||= new(attrs[:topic], attrs[:partition], 0)
     end
