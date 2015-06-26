@@ -34,6 +34,8 @@ module CC
         end
 
         Kafka.logger.info("shutting down due to TERM signal")
+
+      ensure
         @consumer.close
       end
 
