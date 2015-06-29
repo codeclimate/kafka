@@ -77,6 +77,14 @@ consumer.start
   Kafka.logger = Rails.logger
   ```
 
+- `Kafka.statsd`
+
+  This is optional and defaults to a null object. The configured object should
+  represent a [statsd][] client and respond to the usual methods, `increment`,
+  `time`, etc.
+
+  [statsd]: https://github.com/reinh/statsd
+
 ## Copyright
 
 See [LICENSE](LICENSE)
