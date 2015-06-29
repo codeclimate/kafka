@@ -33,7 +33,7 @@ consumer.on_message do |message|
   #   {
   #     "foo" => :bar,
   #     "baz" => :bat,
-  #     "kafka_message_offset" => "topic-0-1",
+  #     CC::Kafka::MESSAGE_OFFSET_KEY => "topic-0-1",
   #   }
   #
 end
@@ -41,17 +41,12 @@ end
 consumer.start
 ```
 
-Note: the value for the `kafka_message_offset` identifies the message's offset
+Note: the value for the `MESSAGE_OFFSET_KEY` identifies the message's offset
 within the given topic and partition as `<topic>-<partition>-<offset>`. It can
 be used by consumers to tie created data to the message that lead to it and
 prevent duplicate processing.
 
 ## Configuration
-
-- `CC::Kafka.offset_key`
-
-  The key used when adding the message offset to yielded deserialized data.
-  Defaults to `"kafka_message_offset"`.
 
 - `CC::Kafka.offset_model`
 

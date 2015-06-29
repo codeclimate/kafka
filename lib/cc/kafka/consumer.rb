@@ -3,6 +3,8 @@ require "poseidon"
 module CC
   module Kafka
     class Consumer
+      MESSAGE_OFFSET_KEY = "kafka_message_offset"
+
       def initialize(client_id, seed_brokers, topic, partition)
         @offset = Kafka.offset_model.find_or_create!(
           topic: topic,
@@ -52,7 +54,7 @@ module CC
 
             Kafka.offset_model.transaction do
               data = BSON.deserialize(message.value)
-              data[Kafka.offset_key] = [
+              data[MESSAGE_OFFSET_KEY] = [
                 @offset.topic,
                 @offset.partition,
                 message.offset,
