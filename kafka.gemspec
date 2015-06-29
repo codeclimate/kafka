@@ -2,13 +2,13 @@ $LOAD_PATH.unshift(File.join(__FILE__, "../lib"))
 require "cc/kafka/version"
 
 Gem::Specification.new do |s|
-  s.name        = "kafka"
+  s.name        = "codeclimate-kafka"
   s.version     = CC::Kafka::VERSION
   s.summary     = "Code Climate Kafka Client"
   s.license     = "MIT"
   s.authors     = "Code Climate"
   s.email       = "hello@codeclimate.com"
-  s.homepage    = "https://github.com.com/codeclimate/kafka"
+  s.homepage    = "https://codeclimate.com"
   s.description = "Code Climate Kafka Client"
 
   s.files         = Dir["lib/**/*.rb"]
