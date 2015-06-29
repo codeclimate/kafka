@@ -3,6 +3,8 @@ require "poseidon"
 module CC
   module Kafka
     class Consumer
+      MESSAGE_OFFSET_KEY = "kafka_message_offset".freeze
+
       def initialize(client_id, seed_brokers, topic, partition)
         @offset = Kafka.offset_model.find_or_create!(
           topic: topic,
@@ -34,7 +36,6 @@ module CC
         end
 
         Kafka.logger.info("shutting down due to TERM signal")
-
       ensure
         @consumer.close
       end
@@ -52,7 +53,14 @@ module CC
             @offset.set(current: message.offset + 1)
 
             Kafka.offset_model.transaction do
-              @on_message.call(BSON.deserialize(message.value))
+              data = BSON.deserialize(message.value)
+              data[MESSAGE_OFFSET_KEY] = [
+                @offset.topic,
+                @offset.partition,
+                message.offset,
+              ].join("-")
+
+              @on_message.call(data)
             end
           end
           Kafka.statsd.increment("messages.processed")

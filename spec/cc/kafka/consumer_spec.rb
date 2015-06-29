@@ -30,9 +30,9 @@ module CC::Kafka
         offset = Offset.find_or_create!(topic: "a-topic", partition: "a-partition")
         expect(offset.current).to eq 4
         expect(messages_seen).to eq [
-          { "x" => 1 },
-          { "x" => 2 },
-          { "x" => 3 },
+          {"x"=>1, "kafka_message_offset"=>"a-topic-a-partition-1"},
+          {"x"=>2, "kafka_message_offset"=>"a-topic-a-partition-2"},
+          {"x"=>3, "kafka_message_offset"=>"a-topic-a-partition-3"},
         ]
       end
     end
