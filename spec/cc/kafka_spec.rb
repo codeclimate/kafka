@@ -35,5 +35,19 @@ module CC
         expect(Kafka.offset_model).to eq offset_model
       end
     end
+
+    describe "#statsd" do
+      it "defaults to a null object" do
+        expect { Kafka.statsd.foo }.not_to raise_error
+      end
+
+      it "can be set" do
+        statsd = Object.new
+
+        Kafka.statsd = statsd
+
+        expect(Kafka.statsd).to eq statsd
+      end
+    end
   end
 end

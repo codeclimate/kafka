@@ -6,8 +6,14 @@ module CC
   module Kafka
     ConfigurationError = Class.new(StandardError)
 
+    class DummyStatsd
+      def method_missing(*)
+        yield if block_given?
+      end
+    end
+
     class << self
-      attr_writer :offset_model, :logger
+      attr_writer :offset_model, :logger, :statsd
 
       def logger
         @logger ||= Logger.new(STDOUT)
@@ -19,6 +25,10 @@ module CC
         end
 
         @offset_model
+      end
+
+      def statsd
+        @statsd ||= DummyStatsd.new
       end
     end
   end
