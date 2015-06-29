@@ -47,11 +47,15 @@ module CC
 
       def fetch_messages
         @consumer.fetch.each do |message|
-          @offset.set(current: message.offset + 1)
+          Kafka.statsd.increment("messages.received")
+          Kafka.statsd.time("messages.processing") do
+            @offset.set(current: message.offset + 1)
 
-          Kafka.offset_model.transaction do
-            @on_message.call(BSON.deserialize(message.value))
+            Kafka.offset_model.transaction do
+              @on_message.call(BSON.deserialize(message.value))
+            end
           end
+          Kafka.statsd.increment("messages.processed")
         end
       rescue Poseidon::Errors::UnknownTopicOrPartition
         Kafka.logger.debug("topic #{@topic} not created yet")
