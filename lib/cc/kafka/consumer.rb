@@ -3,7 +3,7 @@ require "poseidon"
 module CC
   module Kafka
     class Consumer
-      MESSAGE_OFFSET_KEY = "kafka_message_offset"
+      MESSAGE_OFFSET_KEY = "kafka_message_offset".freeze
 
       def initialize(client_id, seed_brokers, topic, partition)
         @offset = Kafka.offset_model.find_or_create!(
