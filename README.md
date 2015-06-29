@@ -28,13 +28,30 @@ producer.close
 ```rb
 consumer = CC::Kafka::Consumer.new("client-id", ["kafka://host:1234", "..."], "topic", 0)
 consumer.on_message do |message|
-  # message will be { "foo" => :bar, "baz" => :bat }
+  # Given the producer above, message will be
+  #
+  #   {
+  #     "foo" => :bar,
+  #     "baz" => :bat,
+  #     "kafka_message_offset" => "topic-0-1",
+  #   }
+  #
 end
 
 consumer.start
 ```
 
+Note: the value for the `kafka_message_offset` identifies the message's offset
+within the given topic and partition as `<topic>-<partition>-<offset>`. It can
+be used by consumers to tie created data to the message that lead to it and
+prevent duplicate processing.
+
 ## Configuration
+
+- `CC::Kafka.offset_key`
+
+  The key used when adding the message offset to yielded deserialized data.
+  Defaults to `"kafka_message_offset"`.
 
 - `CC::Kafka.offset_model`
 

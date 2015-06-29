@@ -13,10 +13,14 @@ module CC
     end
 
     class << self
-      attr_writer :offset_model, :logger, :statsd
+      attr_writer :offset_key, :offset_model, :logger, :statsd
 
       def logger
         @logger ||= Logger.new(STDOUT)
+      end
+
+      def offset_key
+        @offset_key ||= "kafka_message_offset"
       end
 
       def offset_model

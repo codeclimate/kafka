@@ -34,7 +34,6 @@ module CC
         end
 
         Kafka.logger.info("shutting down due to TERM signal")
-
       ensure
         @consumer.close
       end
@@ -52,7 +51,14 @@ module CC
             @offset.set(current: message.offset + 1)
 
             Kafka.offset_model.transaction do
-              @on_message.call(BSON.deserialize(message.value))
+              data = BSON.deserialize(message.value)
+              data[Kafka.offset_key] = [
+                @offset.topic,
+                @offset.partition,
+                message.offset,
+              ].join("-")
+
+              @on_message.call(data)
             end
           end
           Kafka.statsd.increment("messages.processed")
