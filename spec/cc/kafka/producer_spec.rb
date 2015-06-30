@@ -20,7 +20,7 @@ module CC::Kafka
           with(["host:1234"], "a-client-id", compression_codec: :gzip).
           and_return(poseidon_producer)
 
-        producer = Producer.new("a-client-id", "kafka://host:1234/a-topic")
+        producer = Producer.new("kafka://host:1234/a-topic", "a-client-id")
         producer.send_message(data, "a-key")
       end
 
@@ -30,7 +30,7 @@ module CC::Kafka
 
         allow(Poseidon::MessageToSend).to receive(:new).and_raise(error)
 
-        producer = Producer.new("a-client-id", "kafka://host:1234/a-topic")
+        producer = Producer.new("kafka://host:1234/a-topic", "")
 
         expect(poseidon_producer).to receive(:close)
         expect { producer.send_message({}) }.to raise_error(error)
@@ -40,7 +40,7 @@ module CC::Kafka
         it "POSTs to /message with serialized data" do
           data = { some: :data }
           serialized = BSON.serialize(data).to_s
-          producer = Producer.new("", "http://host:8080/a-topic")
+          producer = Producer.new("http://host:8080/a-topic")
 
           request = stub_request(:post, "host:8080/message").
             with(body: {
@@ -57,7 +57,7 @@ module CC::Kafka
         it "doesn't include a nil key" do
           data = { some: :data }
           serialized = BSON.serialize(data).to_s
-          producer = Producer.new("", "http://host:8080/a-topic")
+          producer = Producer.new("http://host:8080/a-topic")
 
           request = stub_request(:post, "host:8080/message").
             with(body: {
@@ -71,7 +71,7 @@ module CC::Kafka
         end
 
         it "raises if the response is unsuccessful" do
-          producer = Producer.new("", "http://host:8080/a-topic")
+          producer = Producer.new("http://host:8080/a-topic")
 
           stub_request(:post, "host:8080/message").to_return(status: 500)
 
@@ -85,7 +85,7 @@ module CC::Kafka
         poseidon_producer = stub_producer
 
         expect(poseidon_producer).to receive(:close)
-        Producer.new("a-client-id", "kafka://host:1234/a-topic").close
+        Producer.new("kafka://host:1234/a-topic", "").close
       end
     end
 

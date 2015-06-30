@@ -11,9 +11,9 @@ module CC
 
       HTTPError = Class.new(StandardError)
 
-      def initialize(client_id, url)
-        @client_id = client_id
+      def initialize(url, client_id = nil)
         @url = url
+        @client_id = client_id
       end
 
       def send_message(data, key = nil)

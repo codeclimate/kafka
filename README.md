@@ -18,7 +18,7 @@ require "cc/kafka"
 ### Producer
 
 ```rb
-producer = CC::Kafka::Producer.new("client-id", "kafka://host:1234/topic")
+producer = CC::Kafka::Producer.new("kafka://host:1234/topic", "client-id")
 producer.send_message(foo: :bar, baz: :bat)
 producer.close
 ```
