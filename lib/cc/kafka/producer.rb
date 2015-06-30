@@ -10,6 +10,7 @@ module CC
       ]
 
       HTTPError = Class.new(StandardError)
+      HTTP_TIMEOUT= 60 # seconds
 
       def initialize(url, client_id = nil)
         @url = url
@@ -46,6 +47,8 @@ module CC
         data["key"] = key if key
 
         http = Net::HTTP.new(uri.host, uri.port)
+        http.open_timeout = HTTP_TIMEOUT
+        http.read_timeout = HTTP_TIMEOUT
         request = Net::HTTP::Post.new("/message")
         request.set_form_data(data)
 
