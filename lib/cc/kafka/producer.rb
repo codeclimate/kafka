@@ -4,27 +4,68 @@ require "poseidon"
 module CC
   module Kafka
     class Producer
-      def initialize(client_id, url)
-        @client_id = client_id
+      SCHEMES = [
+        HTTP = "http",
+        KAFKA = "kafka",
+      ]
+
+      HTTPError = Class.new(StandardError)
+      HTTP_TIMEOUT= 60 # seconds
+
+      def initialize(url, client_id = nil)
         @url = url
+        @client_id = client_id
       end
 
       def send_message(data, key = nil)
         serialized = BSON.serialize(data).to_s
-        message = Poseidon::MessageToSend.new(topic, serialized, key)
 
-        producer.send_messages([message])
-      rescue
-        close
-
-        raise
+        if http?
+          send_http(serialized, key)
+        else
+          send_poseidon(serialized, key)
+        end
       end
 
       def close
-        producer.close
+        unless http?
+          producer.close
+        end
       end
 
       private
+
+      def http?
+        uri.scheme == HTTP
+      end
+
+      def send_http(serialized, key)
+        data = {
+          "topic" => topic,
+          "message" => serialized,
+        }
+        data["key"] = key if key
+
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.open_timeout = HTTP_TIMEOUT
+        http.read_timeout = HTTP_TIMEOUT
+        request = Net::HTTP::Post.new("/message")
+        request.set_form_data(data)
+
+        response = http.request(request)
+
+        unless response.is_a?(Net::HTTPSuccess)
+          raise HTTPError, "request not successful: #{response.inspect}"
+        end
+      end
+
+      def send_poseidon(serialized, key)
+        message = Poseidon::MessageToSend.new(topic, serialized, key)
+        producer.send_messages([message])
+      rescue
+        producer.close
+        raise
+      end
 
       def producer
         @producer ||= Poseidon::Producer.new(
