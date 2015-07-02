@@ -1,0 +1,77 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift(File.expand_path(File.join(File.dirname(__FILE__), "../lib")))
+
+require "bundler"
+Bundler.setup
+
+require "cc/kafka"
+
+# In-memory offset store
+CC::Kafka.offset_model = Class.new do
+  attr_reader :topic, :partition
+
+  def self.find_or_create!(attrs)
+    new(attrs)
+  end
+
+  def self.transaction
+    yield
+  end
+
+  def initialize(attrs)
+    set(attrs)
+  end
+
+  def current
+    @current ||= 0
+  end
+
+  def set(attrs)
+    attrs.each do |k, v|
+      instance_variable_set(:"@#{k}", v)
+    end
+  end
+end
+
+# Configuration values
+broker = "172.17.42.1:9092"
+client_id = "example-client-id"
+topic = "test-topic"
+partitions = [0, 1]
+
+url = "kafka://#{broker}/#{topic}"
+
+consumer_threads = partitions.map do |partition|
+  # Consumer example:
+  consumer = CC::Kafka::Consumer.new(client_id, [broker], topic, partition)
+  consumer.on_message do |message|
+    CC::Kafka.logger.info("consumer #{partition} got #{message.inspect}")
+  end
+
+  [consumer, Thread.new { consumer.start }]
+end
+
+# Producer example:
+producer = CC::Kafka::Producer.new(url, client_id)
+producer.send_message(example: :message)
+producer.close
+
+consumer_threads.each do |consumer, thread|
+  consumer.stop
+  thread.join
+end
+
+# Example output:
+#
+# ... : offset: test-topic/0 0
+# ... : offset: test-topic/1 0
+# ... : consumer 0 got {"example"=>:message, "kafka_message_offset"=>"test-topic-0-0"}
+# ... : consumer 0 got {"example"=>:message, "kafka_message_offset"=>"test-topic-0-1"}
+# ... : consumer 0 got {"example"=>:message, "kafka_message_offset"=>"test-topic-0-2"}
+# ... : consumer 0 got {"example"=>:message, "kafka_message_offset"=>"test-topic-0-3"}
+# ... : consumer 1 got {"example"=>:message, "kafka_message_offset"=>"test-topic-1-0"}
+# ... : consumer 1 got {"example"=>:message, "kafka_message_offset"=>"test-topic-1-1"}
+# ... : consumer 1 got {"example"=>:message, "kafka_message_offset"=>"test-topic-1-2"}
+# ... : consumer 1 got {"example"=>:message, "kafka_message_offset"=>"test-topic-1-3"}
+# ... : shutting down due to TERM signal
+# ... : shutting down due to TERM signal
