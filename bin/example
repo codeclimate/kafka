@@ -27,7 +27,7 @@ CC::Kafka.offset_model = Class.new do
   end
 
   def set(attrs)
-    attrs.each do |k,v|
+    attrs.each do |k, v|
       instance_variable_set(:"@#{k}", v)
     end
   end
