@@ -15,14 +15,20 @@ module CC
       def initialize(url, client_id = nil)
         @url = url
         @client_id = client_id
+
+        Kafka.logger.debug("initialized client for #{@url} (id: #{@client_id.inspect})")
       end
 
       def send_message(data, key = nil)
+        Kafka.logger.debug("data: #{data.inspect}, key: #{key.inspect}")
+
         serialized = BSON.serialize(data).to_s
 
         if http?
+          Kafka.logger.debug("sending message over HTTP")
           send_http(serialized, key)
         else
+          Kafka.logger.debug("sending message direct via Poseidon")
           send_poseidon(serialized, key)
         end
       end
@@ -52,6 +58,8 @@ module CC
         request = Net::HTTP::Post.new("/message")
         request.set_form_data(data)
 
+        Kafka.logger.debug("POST #{uri.host}:#{uri.port}/message")
+        Kafka.logger.debug("form data: #{data.inspect}")
         response = http.request(request)
 
         unless response.is_a?(Net::HTTPSuccess)
