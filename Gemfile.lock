@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    codeclimate-kafka (0.1.1)
+    codeclimate-kafka (0.2.0)
       bson (~> 1.12.2)
       bson_ext (~> 1.12.2)
       poseidon (~> 0.0.5)
@@ -10,9 +10,9 @@ GEM
   remote: https://rubygems.org/
   specs:
     addressable (2.3.8)
-    bson (1.12.2)
-    bson_ext (1.12.2)
-      bson (~> 1.12.2)
+    bson (1.12.3)
+    bson_ext (1.12.3)
+      bson (~> 1.12.3)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
     diff-lcs (1.2.5)
