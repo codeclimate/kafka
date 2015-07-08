@@ -55,7 +55,7 @@ module CC
         request.body = serialized
 
         Kafka.logger.debug("POST #{uri.host}:#{uri.port}/")
-        Kafka.logger.debug("data:  #{serialized.inspect}")
+        Kafka.logger.debug("data: #{serialized.inspect}")
         response = http.request(request)
 
         unless response.is_a?(Net::HTTPSuccess)
