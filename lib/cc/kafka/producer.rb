@@ -63,7 +63,7 @@ module CC
         response = http.request(request)
 
         unless response.is_a?(Net::HTTPSuccess)
-          raise HTTPError, "request not successful: #{response.inspect}"
+          raise HTTPError, "request not successful: (#{response.code}) #{response.body}"
         end
       end
 
