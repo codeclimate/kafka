@@ -37,17 +37,19 @@ module CC::Kafka
       end
 
       context "with an HTTP proxy" do
-        it "POSTs to /message with serialized data" do
+        it "POSTs to / with serialized data" do
           data = { some: :data }
           serialized = BSON.serialize(data).to_s
           producer = Producer.new("http://host:8080/a-topic")
 
-          request = stub_request(:post, "host:8080/message").
-            with(body: {
-              topic: "a-topic",
-              message: serialized,
-              key: "a-key"
-            })
+          request = stub_request(:post, "host:8080/").
+            with(
+              headers: {
+                "Key" => "a-key",
+                "Topic" => "a-topic"
+              },
+              body: serialized,
+            )
 
           producer.send_message(data, "a-key")
 
@@ -59,11 +61,11 @@ module CC::Kafka
           serialized = BSON.serialize(data).to_s
           producer = Producer.new("http://host:8080/a-topic")
 
-          request = stub_request(:post, "host:8080/message").
-            with(body: {
-              topic: "a-topic",
-              message: serialized,
-            })
+          request = stub_request(:post, "host:8080/").
+            with(
+              headers: { "Topic" => "a-topic" },
+              body: serialized,
+            )
 
           producer.send_message(data)
 
@@ -73,7 +75,7 @@ module CC::Kafka
         it "raises if the response is unsuccessful" do
           producer = Producer.new("http://host:8080/a-topic")
 
-          stub_request(:post, "host:8080/message").to_return(status: 500)
+          stub_request(:post, "host:8080/").to_return(status: 500)
 
           expect { producer.send_message({}) }.to raise_error(Producer::HTTPError)
         end

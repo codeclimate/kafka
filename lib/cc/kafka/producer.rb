@@ -46,24 +46,20 @@ module CC
       end
 
       def send_http(serialized, key)
-        data = {
-          "topic" => topic,
-          "message" => serialized,
-        }
-        data["key"] = key if key
-
         http = Net::HTTP.new(uri.host, uri.port)
         http.open_timeout = HTTP_TIMEOUT
         http.read_timeout = HTTP_TIMEOUT
-        request = Net::HTTP::Post.new("/message")
-        request.set_form_data(data)
+        request = Net::HTTP::Post.new("/")
+        request["Topic"] = topic
+        request["Key"] = key if key
+        request.body = serialized
 
-        Kafka.logger.debug("POST #{uri.host}:#{uri.port}/message")
-        Kafka.logger.debug("form data: #{data.inspect}")
+        Kafka.logger.debug("POST #{uri.host}:#{uri.port}/")
+        Kafka.logger.debug("data: #{serialized.inspect}")
         response = http.request(request)
 
         unless response.is_a?(Net::HTTPSuccess)
-          raise HTTPError, "request not successful: #{response.inspect}"
+          raise HTTPError, "request not successful: (#{response.code}) #{response.body}"
         end
       end
 

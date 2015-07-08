@@ -34,16 +34,14 @@ CC::Kafka.offset_model = Class.new do
 end
 
 # Configuration values
-broker = "172.17.42.1:9092"
+host = "172.17.42.1"
 client_id = "example-client-id"
 topic = "test-topic"
 partitions = [0, 1]
 
-url = "kafka://#{broker}/#{topic}"
-
 consumer_threads = partitions.map do |partition|
   # Consumer example:
-  consumer = CC::Kafka::Consumer.new(client_id, [broker], topic, partition)
+  consumer = CC::Kafka::Consumer.new(client_id, ["#{host}:9092"], topic, partition)
   consumer.on_message do |message|
     CC::Kafka.logger.info("consumer #{partition} got #{message.inspect}")
   end
@@ -52,8 +50,9 @@ consumer_threads = partitions.map do |partition|
 end
 
 # Producer example:
-producer = CC::Kafka::Producer.new(url, client_id)
-producer.send_message(example: :message)
+producer = CC::Kafka::Producer.new("http://#{host}:8484/#{topic}", client_id)
+producer.send_message(example: BSON::ObjectId.new)
+
 producer.close
 
 consumer_threads.each do |consumer, thread|
