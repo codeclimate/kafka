@@ -77,7 +77,7 @@ module CC::Kafka
 
           stub_request(:post, "host:8080/").to_return(status: 500)
 
-          expect { producer.send_message({}) }.to raise_error(Producer::HTTPError)
+          expect { producer.send_message({}) }.to raise_error(Producer::HTTP::HTTPError)
         end
       end
     end

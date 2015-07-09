@@ -1,16 +1,11 @@
 require "bson"
-require "poseidon"
+require "cc/kafka/producer/http"
+require "cc/kafka/producer/poseidon"
 
 module CC
   module Kafka
     class Producer
-      SCHEMES = [
-        HTTP = "http",
-        KAFKA = "kafka",
-      ]
-
-      HTTPError = Class.new(StandardError)
-      HTTP_TIMEOUT= 60 # seconds
+      InvalidScheme = Class.new(StandardError)
 
       def initialize(url, client_id = nil)
         @url = url
@@ -22,65 +17,40 @@ module CC
       def send_message(data, key = nil)
         Kafka.logger.debug("data: #{data.inspect}, key: #{key.inspect}")
 
-        serialized = BSON.serialize(data).to_s
-
-        if http?
-          Kafka.logger.debug("sending message over HTTP")
-          send_http(serialized, key)
-        else
-          Kafka.logger.debug("sending message direct via Poseidon")
-          send_poseidon(serialized, key)
-        end
-      end
-
-      def close
-        unless http?
-          producer.close
-        end
-      end
-
-      private
-
-      def http?
-        uri.scheme == HTTP
-      end
-
-      def send_http(serialized, key)
-        http = Net::HTTP.new(uri.host, uri.port)
-        http.open_timeout = HTTP_TIMEOUT
-        http.read_timeout = HTTP_TIMEOUT
-        request = Net::HTTP::Post.new("/")
-        request["Topic"] = topic
-        request["Key"] = key if key
-        request.body = serialized
-
-        Kafka.logger.debug("POST #{uri.host}:#{uri.port}/")
-        Kafka.logger.debug("data: #{serialized.inspect}")
-        response = http.request(request)
-
-        unless response.is_a?(Net::HTTPSuccess)
-          raise HTTPError, "request not successful: (#{response.code}) #{response.body}"
-        end
-      end
-
-      def send_poseidon(serialized, key)
-        message = Poseidon::MessageToSend.new(topic, serialized, key)
-        producer.send_messages([message])
+        producer.send_message(BSON.serialize(data).to_s, key)
       rescue
         producer.close
         raise
       end
 
-      def producer
-        @producer ||= Poseidon::Producer.new(
-          broker,
-          @client_id,
-          compression_codec: :gzip
-        )
+      def close
+        producer.close
       end
 
-      def broker
-        ["#{uri.host}:#{uri.port}"]
+      private
+
+      def producer
+        @producer ||= choose_producer
+      end
+
+      def choose_producer
+        case (scheme = uri.scheme)
+        when "http" then HTTP.new(host, port, topic)
+        when "kafka" then Poseidon.new(host, port, topic, @client_id)
+        else raise InvalidScheme, "invalid scheme #{scheme.inspect}"
+        end
+      end
+
+      def scheme
+        uri.scheme
+      end
+
+      def host
+        uri.host
+      end
+
+      def port
+        uri.port
       end
 
       def topic
