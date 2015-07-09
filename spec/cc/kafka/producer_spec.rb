@@ -3,6 +3,8 @@ require "spec_helper"
 module CC::Kafka
   describe Producer do
     describe "#send_message" do
+      it "chooses the right producer based on scheme"
+
       it "sends a message via Poseidon" do
         data = { some: :data }
         serialized = BSON.serialize(data).to_s
@@ -34,51 +36,6 @@ module CC::Kafka
 
         expect(poseidon_producer).to receive(:close)
         expect { producer.send_message({}) }.to raise_error(error)
-      end
-
-      context "with an HTTP proxy" do
-        it "POSTs to / with serialized data" do
-          data = { some: :data }
-          serialized = BSON.serialize(data).to_s
-          producer = Producer.new("http://host:8080/a-topic")
-
-          request = stub_request(:post, "host:8080/").
-            with(
-              headers: {
-                "Key" => "a-key",
-                "Topic" => "a-topic"
-              },
-              body: serialized,
-            )
-
-          producer.send_message(data, "a-key")
-
-          expect(request).to have_been_made
-        end
-
-        it "doesn't include a nil key" do
-          data = { some: :data }
-          serialized = BSON.serialize(data).to_s
-          producer = Producer.new("http://host:8080/a-topic")
-
-          request = stub_request(:post, "host:8080/").
-            with(
-              headers: { "Topic" => "a-topic" },
-              body: serialized,
-            )
-
-          producer.send_message(data)
-
-          expect(request).to have_been_made
-        end
-
-        it "raises if the response is unsuccessful" do
-          producer = Producer.new("http://host:8080/a-topic")
-
-          stub_request(:post, "host:8080/").to_return(status: 500)
-
-          expect { producer.send_message({}) }.to raise_error(Producer::HTTP::HTTPError)
-        end
       end
     end
 
