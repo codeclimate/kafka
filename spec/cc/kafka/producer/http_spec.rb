@@ -19,6 +19,22 @@ class CC::Kafka::Producer
         expect(request).to have_been_made
       end
 
+      it "POSTs to https:// if configured with ssl: true" do
+        producer = HTTP.new("host", 8080, "a-topic", true)
+        request = stub_request(:post, "https://host:8080/").
+          with(
+            headers: {
+              "Key" => "a-key",
+              "Topic" => "a-topic"
+            },
+            body: "some-data",
+          )
+
+        producer.send_message("some-data", "a-key")
+
+        expect(request).to have_been_made
+      end
+
       it "doesn't include a nil key" do
         producer = HTTP.new("host", 8080, "a-topic")
         request = stub_request(:post, "host:8080/").

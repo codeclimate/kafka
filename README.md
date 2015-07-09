@@ -97,6 +97,16 @@ prevent duplicate processing.
 
   [statsd]: https://github.com/reinh/statsd
 
+- `Kafka.ssl_certificates`
+
+  For `https://` production (`Consumer` does not support HTTP), use this
+  configuration option to specific custom SSL certificates.
+
+  ```rb
+  Kafka.ssl_certificates << "/certs/Foo.crt"
+  Kafka.ssl_certificates << "/certs/BarCA.crt"
+  ```
+
 ## Copyright
 
 See [LICENSE](LICENSE)

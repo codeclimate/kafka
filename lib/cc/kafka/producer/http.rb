@@ -18,6 +18,12 @@ module CC
           http.open_timeout = HTTP_TIMEOUT
           http.read_timeout = HTTP_TIMEOUT
 
+          if ssl?
+            http.use_ssl = true
+            http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+            http.cert_store = certificate_store
+          end
+
           request = Net::HTTP::Post.new("/")
           request["Topic"] = @topic
           request["Key"] = key if key
@@ -32,6 +38,22 @@ module CC
 
         def close
           # no-op
+        end
+
+        private
+
+        def ssl?
+          @ssl
+        end
+
+        def certificate_store
+          OpenSSL::X509::Store.new.tap do |store|
+            store.set_default_paths
+
+            Kafka.ssl_certificates.each do |file|
+              store.add_file(file)
+            end
+          end
         end
       end
     end
