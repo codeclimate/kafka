@@ -3,7 +3,7 @@ module CC
     class Producer
       class HTTP
         HTTPError = Class.new(StandardError)
-        HTTP_TIMEOUT= 60 # seconds
+        HTTP_TIMEOUT = 60 # seconds
 
         def initialize(host, port, topic, ssl = false)
           @host = host

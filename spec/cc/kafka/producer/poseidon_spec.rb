@@ -39,4 +39,3 @@ class CC::Kafka::Producer
     end
   end
 end
-
