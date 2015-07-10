@@ -2,98 +2,57 @@ require "spec_helper"
 
 module CC::Kafka
   describe Producer do
+    let(:producer) { double(send_message: nil, close: nil) }
+
+    before do
+      allow(Producer::HTTP).to receive(:new).and_return(producer)
+      allow(Producer::Poseidon).to receive(:new).and_return(producer)
+    end
+
     describe "#send_message" do
-      it "sends a message via Poseidon" do
+      it "chooses the right producer for http://" do
+        expect(Producer::HTTP).to receive(:new).
+          with("host", 8080, "a-topic").
+          and_return(producer)
+
+        Producer.new("http://host:8080/a-topic").send_message({})
+      end
+
+      it "chooses the right producer for kafka://" do
+        expect(Producer::Poseidon).to receive(:new).
+          with("host", 8080, "a-topic", "a-client-id").
+          and_return(producer)
+
+        Producer.new("kafka://host:8080/a-topic", "a-client-id").send_message({})
+      end
+
+      it "raises an exception on an invalid scheme" do
+        expect { Producer.new("ftp://host").send_message({}) }.to raise_error(Producer::InvalidScheme)
+      end
+
+      it "sends BSON-serialized data" do
         data = { some: :data }
-        serialized = BSON.serialize(data).to_s
 
-        poseidon_message = double("Message")
-        expect(Poseidon::MessageToSend).to receive(:new).
-          with("a-topic", serialized, "a-key").
-          and_return(poseidon_message)
+        expect(producer).to receive(:send_message).
+          with(BSON.serialize(data).to_s, "a-key")
 
-        poseidon_producer = double("Producer")
-        expect(poseidon_producer).to receive(:send_messages).
-          with([poseidon_message])
-
-        expect(Poseidon::Producer).to receive(:new).
-          with(["host:1234"], "a-client-id", compression_codec: :gzip).
-          and_return(poseidon_producer)
-
-        producer = Producer.new("kafka://host:1234/a-topic", "a-client-id")
-        producer.send_message(data, "a-key")
+        Producer.new("http://host").send_message(data, "a-key")
       end
 
       it "closes the producer on exceptions" do
-        error = RuntimeError.new("boom")
-        poseidon_producer = stub_producer
+        ex = RuntimeError.new("boom")
+        allow(BSON).to receive(:serialize).and_raise(ex)
 
-        allow(Poseidon::MessageToSend).to receive(:new).and_raise(error)
-
-        producer = Producer.new("kafka://host:1234/a-topic", "")
-
-        expect(poseidon_producer).to receive(:close)
-        expect { producer.send_message({}) }.to raise_error(error)
-      end
-
-      context "with an HTTP proxy" do
-        it "POSTs to / with serialized data" do
-          data = { some: :data }
-          serialized = BSON.serialize(data).to_s
-          producer = Producer.new("http://host:8080/a-topic")
-
-          request = stub_request(:post, "host:8080/").
-            with(
-              headers: {
-                "Key" => "a-key",
-                "Topic" => "a-topic"
-              },
-              body: serialized,
-            )
-
-          producer.send_message(data, "a-key")
-
-          expect(request).to have_been_made
-        end
-
-        it "doesn't include a nil key" do
-          data = { some: :data }
-          serialized = BSON.serialize(data).to_s
-          producer = Producer.new("http://host:8080/a-topic")
-
-          request = stub_request(:post, "host:8080/").
-            with(
-              headers: { "Topic" => "a-topic" },
-              body: serialized,
-            )
-
-          producer.send_message(data)
-
-          expect(request).to have_been_made
-        end
-
-        it "raises if the response is unsuccessful" do
-          producer = Producer.new("http://host:8080/a-topic")
-
-          stub_request(:post, "host:8080/").to_return(status: 500)
-
-          expect { producer.send_message({}) }.to raise_error(Producer::HTTPError)
-        end
+        expect(producer).to receive(:close)
+        expect { Producer.new("http://host").send_message({}, nil) }.to raise_error(ex)
       end
     end
 
     describe "#close" do
-      it "closes the Poseidon producer" do
-        poseidon_producer = stub_producer
+      it "closes the producer" do
+        expect(producer).to receive(:close)
 
-        expect(poseidon_producer).to receive(:close)
-        Producer.new("kafka://host:1234/a-topic", "").close
-      end
-    end
-
-    def stub_producer
-      double("Poseidon::Producer").tap do |producer|
-        allow(Poseidon::Producer).to receive(:new).and_return(producer)
+        Producer.new("http://host").close
       end
     end
   end

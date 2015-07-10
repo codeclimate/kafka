@@ -31,5 +31,17 @@ Style/DotPosition:
 Metrics/AbcSize:
   Enabled: false
 
+Rails/Delegate:
+  Enabled: false
+
 Rails/TimeZone:
   Enabled: false
+
+Style/SignalException:
+  Enabled: false
+
+Style/GuardClause:
+  Enabled: false
+
+Style/MultilineOperationIndentation:
+  EnforcedStyle: indented

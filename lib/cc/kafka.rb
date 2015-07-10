@@ -30,6 +30,10 @@ module CC
       def statsd
         @statsd ||= DummyStatsd.new
       end
+
+      def ssl_certificates
+        @ssl_certificates ||= []
+      end
     end
   end
 end
