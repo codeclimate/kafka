@@ -18,6 +18,14 @@ module CC::Kafka
         Producer.new("http://host:8080/a-topic").send_message({})
       end
 
+      it "chooses the right producer for https://" do
+        expect(Producer::HTTP).to receive(:new).
+          with("host", 8080, "a-topic", true).
+          and_return(producer)
+
+        Producer.new("https://host:8080/a-topic").send_message({})
+      end
+
       it "chooses the right producer for kafka://" do
         expect(Producer::Poseidon).to receive(:new).
           with("host", 8080, "a-topic", "a-client-id").

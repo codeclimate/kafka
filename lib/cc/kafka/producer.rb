@@ -36,6 +36,7 @@ module CC
       def choose_producer
         case (scheme = uri.scheme)
         when "http" then HTTP.new(host, port, topic)
+        when "https" then HTTP.new(host, port, topic, true)
         when "kafka" then Poseidon.new(host, port, topic, @client_id)
         else raise InvalidScheme, "invalid scheme #{scheme.inspect}"
         end
