@@ -105,7 +105,7 @@ prevent duplicate processing.
   Will result in:
 
   ```rb
-  http.ca_file = Kafka.ca_file
+  http.ca_file = Kafka.ssl_ca_file
   ```
 
 - `Kafka.ssl_pem_file`
