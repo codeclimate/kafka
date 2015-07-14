@@ -48,12 +48,12 @@ module CC
 
         def add_ssl_certificates(http)
           if Kafka.ssl_ca_file
-            Kafka.logger.debug("CA certificate: #{Kafka.ssl_ca_file}"
+            Kafka.logger.debug("CA certificate: #{Kafka.ssl_ca_file}")
             http.ca_file = Kafka.ssl_ca_file
           end
 
           if Kafka.ssl_pem_file
-            Kafka.logger.debug("PEM certificate: #{Kafka.ssl_pem_file}"
+            Kafka.logger.debug("PEM certificate: #{Kafka.ssl_pem_file}")
             pem = File.read(Kafka.ssl_pem_file)
             http.cert = OpenSSL::X509::Certificate.new(pem)
             http.key = OpenSSL::PKey::RSA.new(pem)
