@@ -49,17 +49,5 @@ module CC
         expect(Kafka.statsd).to eq statsd
       end
     end
-
-    describe "#ssl_certificates" do
-      it "is an array that can be appended to" do
-        Kafka.ssl_certificates << "/certs/Foo.crt"
-        Kafka.ssl_certificates << "/certs/BarCA.crt"
-
-        expect(Kafka.ssl_certificates).to match_array([
-          "/certs/Foo.crt",
-          "/certs/BarCA.crt",
-        ])
-      end
-    end
   end
 end

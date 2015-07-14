@@ -8,6 +8,7 @@ Features:
 - Connections will be properly closed on exceptions
 - Consumer will stop gracefully on `SIGTERM`
 - *At most once* consumer semantics are used
+- Production via an HTTP proxy (including SSL)
 
 ## Usage
 
@@ -97,14 +98,27 @@ prevent duplicate processing.
 
   [statsd]: https://github.com/reinh/statsd
 
-- `Kafka.ssl_certificates`
+- `Kafka.ssl_ca_file`
 
-  For `https://` production (`Consumer` does not support HTTP), use this
-  configuration option to specific custom SSL certificates.
+  Path to a custom SSL Certificate Authority file.
+
+  Will result in:
 
   ```rb
-  Kafka.ssl_certificates << "/certs/Foo.crt"
-  Kafka.ssl_certificates << "/certs/BarCA.crt"
+  http.ca_file = Kafka.ca_file
+  ```
+
+- `Kafka.ssl_pem_file`
+
+  Path to a custom SSL Certificate (and key) in concatenated, PEM format.
+
+  Will result in:
+
+  ```rb
+  pem = File.read(Kafka.ssl_pem_file)
+
+  http.cert = OpenSSL::X509::Certificate.new(pem)
+  http.key = OpenSSL::PKey::RSA.new(pem)
   ```
 
 ## Copyright

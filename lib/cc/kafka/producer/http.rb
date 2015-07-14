@@ -21,7 +21,7 @@ module CC
           if ssl?
             http.use_ssl = true
             http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-            http.cert_store = certificate_store
+            add_ssl_certificates(http)
           end
 
           request = Net::HTTP::Post.new("/")
@@ -46,13 +46,17 @@ module CC
           @ssl
         end
 
-        def certificate_store
-          OpenSSL::X509::Store.new.tap do |store|
-            store.set_default_paths
+        def add_ssl_certificates(http)
+          if Kafka.ssl_ca_file
+            Kafka.logger.debug("CA certificate: #{Kafka.ssl_ca_file}"
+            http.ca_file = Kafka.ssl_ca_file
+          end
 
-            Kafka.ssl_certificates.each do |file|
-              store.add_file(file)
-            end
+          if Kafka.ssl_pem_file
+            Kafka.logger.debug("PEM certificate: #{Kafka.ssl_pem_file}"
+            pem = File.read(Kafka.ssl_pem_file)
+            http.cert = OpenSSL::X509::Certificate.new(pem)
+            http.key = OpenSSL::PKey::RSA.new(pem)
           end
         end
       end
