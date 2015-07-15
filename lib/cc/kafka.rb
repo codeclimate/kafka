@@ -13,6 +13,8 @@ module CC
     end
 
     class << self
+      attr_accessor :ssl_ca_file, :ssl_pem_file
+
       attr_writer :offset_model, :logger, :statsd
 
       def logger
@@ -29,10 +31,6 @@ module CC
 
       def statsd
         @statsd ||= DummyStatsd.new
-      end
-
-      def ssl_certificates
-        @ssl_certificates ||= []
       end
     end
   end
