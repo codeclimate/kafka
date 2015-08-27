@@ -2,7 +2,7 @@ require "spec_helper"
 
 module CC::Kafka
   class KafkaOffset < Minidoc
-    include CC::Kafka::KafkaOffsetBase
+    include CC::Kafka::OffsetStorage::Minidoc
   end
 
   describe KafkaOffset do

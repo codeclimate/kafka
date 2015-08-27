@@ -1,6 +1,7 @@
 require "dotenv"
 require "cc/kafka"
 require "webmock/rspec"
+require "minidoc"
 require "minidoc/test_helpers"
 
 Dotenv.overload(".env", ".env.test", ".env.test.local")

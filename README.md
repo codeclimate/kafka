@@ -65,7 +65,7 @@ prevent duplicate processing.
 
   ```rb
   class KafkaOffset < Minidoc
-    include CC::Kafka::KafkaOffsetBase
+    include CC::Kafka::OffsetStorage::Minidoc
   end
 
   CC::Kafka.offset_model = KafkaOffset

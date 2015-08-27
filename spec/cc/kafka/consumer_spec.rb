@@ -3,7 +3,7 @@ require "spec_helper"
 module CC::Kafka
   describe Consumer do
     before do
-      CC::Kafka.offset_model = Offset
+      CC::Kafka.offset_model = OffsetStorage::Memory
     end
 
     describe "#start" do
@@ -26,7 +26,7 @@ module CC::Kafka
         consumer.on_message { |message| messages_seen << message }
         run_consumer(consumer)
 
-        offset = Offset.find_or_create!(topic: "a-topic", partition: "a-partition")
+        offset = CC::Kafka.offset_model.find_or_create!(topic: "a-topic", partition: "a-partition")
         expect(offset.current).to eq 4
         expect(messages_seen).to eq [
           {"x"=>1, "kafka_message_offset"=>"a-topic-a-partition-1"},
@@ -41,20 +41,6 @@ module CC::Kafka
       Thread.new { sleep 0.1 and consumer.stop }
 
       consumer.start
-    end
-  end
-
-  Offset = Struct.new(:topic, :partition, :current) do
-    def self.transaction
-      yield
-    end
-
-    def self.find_or_create!(attrs)
-      @offset ||= new(attrs[:topic], attrs[:partition], nil)
-    end
-
-    def set(attrs)
-      attrs.each { |k,v| self[k] = v }
     end
   end
 end
