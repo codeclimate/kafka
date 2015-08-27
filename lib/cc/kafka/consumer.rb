@@ -11,14 +11,14 @@ module CC
           partition: partition,
         )
 
-        Kafka.logger.debug("offset: #{@offset.topic}/#{@offset.partition} #{@offset.current}")
+        Kafka.logger.debug("offset: #{@offset.topic}/#{@offset.partition} #{current_offset(@offset)}")
 
         @consumer = Poseidon::PartitionConsumer.consumer_for_partition(
           client_id,
           seed_brokers,
           @offset.topic,
           @offset.partition,
-          @offset.current
+          current_offset(@offset)
         )
       end
 
@@ -45,6 +45,10 @@ module CC
       end
 
       private
+
+      def current_offset(offset)
+        offset.current || :earliest_offset
+      end
 
       def fetch_messages
         @consumer.fetch.each do |message|

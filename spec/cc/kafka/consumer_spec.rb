@@ -19,7 +19,7 @@ module CC::Kafka
         allow(poseidon_consumer).to receive(:fetch).and_return([])
         expect(poseidon_consumer).to receive(:fetch).and_return(messages)
         expect(Poseidon::PartitionConsumer).to receive(:consumer_for_partition).
-          with("a-client-id", %w[seed brokers], "a-topic", "a-partition", 0).
+          with("a-client-id", %w[seed brokers], "a-topic", "a-partition", :earliest_offset).
           and_return(poseidon_consumer)
 
         consumer = Consumer.new("a-client-id", %w[seed brokers], "a-topic", "a-partition")
@@ -50,7 +50,7 @@ module CC::Kafka
     end
 
     def self.find_or_create!(attrs)
-      @offset ||= new(attrs[:topic], attrs[:partition], 0)
+      @offset ||= new(attrs[:topic], attrs[:partition], nil)
     end
 
     def set(attrs)
