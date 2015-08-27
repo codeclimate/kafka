@@ -11,7 +11,7 @@ module CC
         end
 
         def set(attrs)
-          attrs.each { |k,v| self[k] = v }
+          attrs.each { |k, v| self[k] = v }
         end
       end
     end
