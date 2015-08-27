@@ -1,5 +1,6 @@
 require "logger"
 require "cc/kafka/consumer"
+require "cc/kafka/kafka_offset_base"
 require "cc/kafka/producer"
 
 module CC
