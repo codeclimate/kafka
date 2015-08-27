@@ -34,7 +34,7 @@ module CC::Kafka
           partition: 0
         )
 
-        expect(offset.current).to eq nil
+        expect(offset.current).to be_nil
       end
     end
   end
