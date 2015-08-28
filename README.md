@@ -59,19 +59,13 @@ prevent duplicate processing.
   The `attributes` used are `topic`, `partition`, and `current`. And the object
   returned from `find_or_create!` must expose methods for each of these.
 
-  [`Minidoc`][minidoc] sub-classes work if a `find_or_create!` method is added.
+  A [`Minidoc`][minidoc]-based module is included that can be included in client code for an offset model implementation that will work for many clients.
 
   [minidoc]: https://github.com/brynary/minidoc
 
   ```rb
   class KafkaOffset < Minidoc
-    attribute :topic, String
-    attribute :partition, Integer
-    attribute :current, Integer, default: 0
-
-    def self.find_or_create!(attrs)
-      find_one(attrs) || create!(attrs)
-    end
+    include CC::Kafka::OffsetStorage::Minidoc
   end
 
   CC::Kafka.offset_model = KafkaOffset

@@ -1,5 +1,7 @@
 require "logger"
 require "cc/kafka/consumer"
+require "cc/kafka/offset_storage/memory"
+require "cc/kafka/offset_storage/minidoc"
 require "cc/kafka/producer"
 
 module CC
