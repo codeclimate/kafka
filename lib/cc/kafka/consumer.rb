@@ -37,11 +37,26 @@ module CC
 
         Kafka.logger.info("shutting down due to TERM signal")
       ensure
-        @consumer.close
+        close
       end
 
       def stop
         @running = false
+      end
+
+      def fetch
+        @consumer.fetch
+      rescue Poseidon::Errors::UnknownTopicOrPartition
+        Kafka.logger.debug("topic #{@offset.topic.inspect} not created yet")
+        []
+      end
+
+      def set_offset(current_offset)
+        @offset.set(current: current_offset)
+      end
+
+      def close
+        @consumer.close
       end
 
       private
@@ -51,10 +66,10 @@ module CC
       end
 
       def fetch_messages
-        @consumer.fetch.each do |message|
+        fetch.each do |message|
           Kafka.statsd.increment("messages.received")
           Kafka.statsd.time("messages.processing") do
-            @offset.set(current: message.offset + 1)
+            set_offset(message.offset + 1)
 
             Kafka.offset_model.transaction do
               data = BSON.deserialize(message.value)
@@ -69,10 +84,6 @@ module CC
           end
           Kafka.statsd.increment("messages.processed")
         end
-      rescue Poseidon::Errors::UnknownTopicOrPartition
-        Kafka.logger.debug("topic #{@topic} not created yet")
-
-        sleep 1
       end
     end
   end
