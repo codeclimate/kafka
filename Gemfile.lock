@@ -14,7 +14,7 @@ PATH
     codeclimate-kafka (0.5.1)
       bson (~> 1.12.2)
       bson_ext (~> 1.12.2)
-      poseidon (~> 0.0.5)
+      codeclimate-poseidon (~> 0.0.6)
 
 GEM
   remote: https://rubygems.org/
@@ -37,6 +37,7 @@ GEM
     bson_ext (1.12.3)
       bson (~> 1.12.3)
     builder (3.2.2)
+    codeclimate-poseidon (0.0.6)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     crack (0.4.2)
@@ -52,7 +53,6 @@ GEM
     minitest (5.8.0)
     mongo (1.12.3)
       bson (= 1.12.3)
-    poseidon (0.0.5)
     rake (10.4.2)
     rspec (3.2.0)
       rspec-core (~> 3.2.0)
