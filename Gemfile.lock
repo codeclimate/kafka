@@ -11,7 +11,7 @@ GIT
 PATH
   remote: .
   specs:
-    codeclimate-kafka (0.5.1)
+    codeclimate-kafka (0.5.2)
       bson (~> 1.12.2)
       bson_ext (~> 1.12.2)
       codeclimate-poseidon (~> 0.0.7)
