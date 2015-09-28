@@ -5,3 +5,6 @@ engines:
 ratings:
   paths:
   - lib/**
+
+exclude_paths:
+- spec/**/*
