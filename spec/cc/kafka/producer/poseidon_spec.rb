@@ -14,7 +14,7 @@ class CC::Kafka::Producer
           with([poseidon_message])
 
         expect(::Poseidon::Producer).to receive(:new).
-          with(["host:1234"], "a-client-id", compression_codec: :gzip).
+          with(["host:1234"], "a-client-id", compression_codec: :gzip, required_acks: -1).
           and_return(poseidon_producer)
 
         producer = Poseidon.new("host", 1234, "a-topic", "a-client-id")
