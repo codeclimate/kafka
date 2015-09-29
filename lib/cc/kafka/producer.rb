@@ -23,13 +23,13 @@ module CC
         raise
       end
 
-      def send_snapshot_document(collection:, document:, snapshot_id:)
+      def send_snapshot_document(collection:, document:, snapshot_id:, **envelope_opts)
         snapshot_id = BSON::ObjectId(snapshot_id) if snapshot_id.is_a?(String)
-        data = {
+        data = envelope_opts.merge(
           type: "document",
           collection: collection,
           document: document.merge(snapshot_id: snapshot_id)
-        }
+        )
         send_message(data, snapshot_id.to_s)
       end
 

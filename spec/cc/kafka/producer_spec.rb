@@ -67,7 +67,11 @@ module CC::Kafka
           document: {foo: "bar", snapshot_id: snapshot_id}
         }
         expect(inner_producer).to receive(:send_message).with(BSON.serialize(expected_message).to_s, snapshot_id.to_s)
-        producer.send_snapshot_document(collection: "test.collection", document: {foo: "bar"}, snapshot_id: snapshot_id)
+        producer.send_snapshot_document(
+          collection: "test.collection",
+          document: {foo: "bar"},
+          snapshot_id: snapshot_id
+        )
       end
 
       it "handles a snapshot ID string" do
@@ -78,7 +82,29 @@ module CC::Kafka
           document: {foo: "bar", snapshot_id: BSON::ObjectId(snapshot_id_str)}
         }
         expect(inner_producer).to receive(:send_message).with(BSON.serialize(expected_message).to_s, snapshot_id_str)
-        producer.send_snapshot_document(collection: "test.collection", document: {foo: "bar"}, snapshot_id: snapshot_id_str)
+        producer.send_snapshot_document(
+          collection: "test.collection",
+          document: {foo: "bar"},
+          snapshot_id: snapshot_id_str
+        )
+      end
+
+      it "supports added envelope options" do
+        enqueued_at = Time.now
+        snapshot_id = BSON::ObjectId.new
+        expected_message = {
+          enqueued_at: enqueued_at,
+          type: "document",
+          collection: "test.collection",
+          document: {foo: "bar", snapshot_id: snapshot_id},
+        }
+        expect(inner_producer).to receive(:send_message).with(BSON.serialize(expected_message).to_s, snapshot_id.to_s)
+        producer.send_snapshot_document(
+          collection: "test.collection",
+          document: {foo: "bar"},
+          snapshot_id: snapshot_id,
+          enqueued_at: enqueued_at
+        )
       end
     end
 
