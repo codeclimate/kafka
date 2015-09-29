@@ -23,6 +23,16 @@ module CC
         raise
       end
 
+      def send_snapshot_document(collection:, document:, snapshot_id:)
+        snapshot_id = BSON::ObjectId(snapshot_id) if snapshot_id.is_a?(String)
+        data = {
+          type: "document",
+          collection: collection,
+          document: document.merge(snapshot_id: snapshot_id)
+        }
+        send_message(data, snapshot_id.to_s)
+      end
+
       def close
         producer.close
       end

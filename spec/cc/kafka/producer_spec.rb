@@ -2,18 +2,18 @@ require "spec_helper"
 
 module CC::Kafka
   describe Producer do
-    let(:producer) { double(send_message: nil, close: nil) }
+    let(:inner_producer) { double(send_message: nil, close: nil) }
 
     before do
-      allow(Producer::HTTP).to receive(:new).and_return(producer)
-      allow(Producer::Poseidon).to receive(:new).and_return(producer)
+      allow(Producer::HTTP).to receive(:new).and_return(inner_producer)
+      allow(Producer::Poseidon).to receive(:new).and_return(inner_producer)
     end
 
     describe "#send_message" do
       it "chooses the right producer for http://" do
         expect(Producer::HTTP).to receive(:new).
           with("host", 8080, "a-topic").
-          and_return(producer)
+          and_return(inner_producer)
 
         Producer.new("http://host:8080/a-topic").send_message({})
       end
@@ -21,7 +21,7 @@ module CC::Kafka
       it "chooses the right producer for https://" do
         expect(Producer::HTTP).to receive(:new).
           with("host", 8080, "a-topic", true).
-          and_return(producer)
+          and_return(inner_producer)
 
         Producer.new("https://host:8080/a-topic").send_message({})
       end
@@ -29,7 +29,7 @@ module CC::Kafka
       it "chooses the right producer for kafka://" do
         expect(Producer::Poseidon).to receive(:new).
           with("host", 8080, "a-topic", "a-client-id").
-          and_return(producer)
+          and_return(inner_producer)
 
         Producer.new("kafka://host:8080/a-topic", "a-client-id").send_message({})
       end
@@ -41,7 +41,7 @@ module CC::Kafka
       it "sends BSON-serialized data" do
         data = { some: :data }
 
-        expect(producer).to receive(:send_message).
+        expect(inner_producer).to receive(:send_message).
           with(BSON.serialize(data).to_s, "a-key")
 
         Producer.new("http://host").send_message(data, "a-key")
@@ -51,14 +51,40 @@ module CC::Kafka
         ex = RuntimeError.new("boom")
         allow(BSON).to receive(:serialize).and_raise(ex)
 
-        expect(producer).to receive(:close)
+        expect(inner_producer).to receive(:close)
         expect { Producer.new("http://host").send_message({}, nil) }.to raise_error(ex)
+      end
+    end
+
+    describe "#send_snapshot_document" do
+      let(:producer) { Producer.new("http://host:8080/a-topic") }
+
+      it "adds snapshot_id to document and forwards to #send_message" do
+        snapshot_id = BSON::ObjectId.new
+        expected_message = {
+          type: "document",
+          collection: "test.collection",
+          document: {foo: "bar", snapshot_id: snapshot_id}
+        }
+        expect(inner_producer).to receive(:send_message).with(BSON.serialize(expected_message).to_s, snapshot_id.to_s)
+        producer.send_snapshot_document(collection: "test.collection", document: {foo: "bar"}, snapshot_id: snapshot_id)
+      end
+
+      it "handles a snapshot ID string" do
+        snapshot_id_str = BSON::ObjectId.new.to_s
+        expected_message = {
+          type: "document",
+          collection: "test.collection",
+          document: {foo: "bar", snapshot_id: BSON::ObjectId(snapshot_id_str)}
+        }
+        expect(inner_producer).to receive(:send_message).with(BSON.serialize(expected_message).to_s, snapshot_id_str)
+        producer.send_snapshot_document(collection: "test.collection", document: {foo: "bar"}, snapshot_id: snapshot_id_str)
       end
     end
 
     describe "#close" do
       it "closes the producer" do
-        expect(producer).to receive(:close)
+        expect(inner_producer).to receive(:close)
 
         Producer.new("http://host").close
       end
