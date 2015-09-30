@@ -27,7 +27,8 @@ module CC
           @producer ||= ::Poseidon::Producer.new(
             @brokers,
             @client_id,
-            compression_codec: :gzip
+            compression_codec: :gzip,
+            required_acks: -1,
           )
         end
       end
