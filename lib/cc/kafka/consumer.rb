@@ -79,7 +79,11 @@ module CC
                 message.offset,
               ].join("-")
 
-              @on_message.call(data)
+              if @on_message.arity == 2
+                @on_message.call(data, message)
+              else
+                @on_message.call(data)
+              end
             end
           end
           Kafka.statsd.increment("messages.processed")
