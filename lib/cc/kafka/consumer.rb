@@ -22,14 +22,27 @@ module CC
         )
       end
 
+      def on_start(&block)
+        @on_start = block
+      end
+
+      def on_stop(&block)
+        @on_stop = block
+      end
+
       def on_message(&block)
         @on_message = block
       end
 
       def start
-        trap(:TERM) { stop }
+        trap(:TERM) do
+          @on_stop.call if @on_stop
+          stop
+        end
 
         @running = true
+
+        @on_start.call if @on_start
 
         while @running do
           fetch_messages
