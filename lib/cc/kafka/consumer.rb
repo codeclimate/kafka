@@ -35,13 +35,9 @@ module CC
       end
 
       def start
-        trap(:TERM) do
-          @on_stop.call(@offset) if @on_stop
-          stop
-        end
+        trap(:TERM) { stop }
 
         @running = true
-
         @on_start.call(@offset) if @on_start
 
         while @running do
@@ -50,6 +46,8 @@ module CC
 
         Kafka.logger.info("shutting down due to TERM signal")
       ensure
+        @on_stop.call(@offset) if @on_stop
+
         close
       end
 
