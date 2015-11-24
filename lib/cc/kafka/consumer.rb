@@ -22,6 +22,14 @@ module CC
         )
       end
 
+      def on_start(&block)
+        @on_start = block
+      end
+
+      def on_stop(&block)
+        @on_stop = block
+      end
+
       def on_message(&block)
         @on_message = block
       end
@@ -30,6 +38,7 @@ module CC
         trap(:TERM) { stop }
 
         @running = true
+        @on_start.call(@offset) if @on_start
 
         while @running do
           fetch_messages
@@ -37,6 +46,8 @@ module CC
 
         Kafka.logger.info("shutting down due to TERM signal")
       ensure
+        @on_stop.call(@offset) if @on_stop
+
         close
       end
 
