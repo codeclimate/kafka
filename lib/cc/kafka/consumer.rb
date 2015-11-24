@@ -36,13 +36,13 @@ module CC
 
       def start
         trap(:TERM) do
-          @on_stop.call if @on_stop
+          @on_stop.call(@offset) if @on_stop
           stop
         end
 
         @running = true
 
-        @on_start.call if @on_start
+        @on_start.call(@offset) if @on_start
 
         while @running do
           fetch_messages
