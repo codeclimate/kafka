@@ -20,6 +20,7 @@ module CC
           @offset.partition,
           current_offset(@offset)
         )
+        @paused = false
       end
 
       def on_start(&block)
@@ -41,7 +42,7 @@ module CC
         @on_start.call(@offset) if @on_start
 
         while @running do
-          fetch_messages
+          fetch_messages unless @paused
         end
 
         Kafka.logger.info("shutting down due to TERM signal")
@@ -53,6 +54,14 @@ module CC
 
       def stop
         @running = false
+      end
+
+      def pause
+        @paused = true
+      end
+
+      def unpause
+        @paused = false
       end
 
       def fetch
