@@ -36,6 +36,23 @@ module CC::Kafka
       end
     end
 
+    describe "pausing" do
+      it "pauses fetching messages" do
+        poseidon_consumer = double("PartitionConsumer")
+        expect(poseidon_consumer).to receive(:close)
+        allow(poseidon_consumer).to receive(:fetch).and_return([])
+        allow(Poseidon::PartitionConsumer).to receive(:consumer_for_partition).
+          and_return(poseidon_consumer)
+
+        consumer = Consumer.new("a-client-id", %w[seed brokers], "a-topic", "a-partition")
+
+        expect(consumer).to receive(:fetch_messages).never
+
+        consumer.pause
+        run_consumer(consumer)
+      end
+    end
+
     # This is arguably a hack, but it does also test the graceful stop behavior
     def run_consumer(consumer)
       Thread.new { sleep 0.1 and consumer.stop }
