@@ -64,6 +64,10 @@ module CC
         @paused = false
       end
 
+      def paused?
+        @paused
+      end
+
       def fetch
         @consumer.fetch
       rescue Poseidon::Errors::UnknownTopicOrPartition
