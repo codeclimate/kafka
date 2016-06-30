@@ -17,5 +17,6 @@ Gem::Specification.new do |s|
   s.add_dependency "bson", "~> 1.12.2"
   s.add_dependency "bson_ext", "~> 1.12.2"
   s.add_dependency "codeclimate-poseidon", "~> 0.0.8"
+  s.add_dependency "ruby-kafka"
   s.add_development_dependency "rake"
 end
