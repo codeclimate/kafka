@@ -14,7 +14,7 @@ PATH
     codeclimate-kafka (0.9.1)
       bson (~> 1.12.2)
       bson_ext (~> 1.12.2)
-      codeclimate-poseidon (~> 0.0.8)
+      codeclimate-poseidon (~> 0.0.12)
 
 GEM
   remote: https://rubygems.org/
@@ -37,7 +37,7 @@ GEM
     bson_ext (1.12.3)
       bson (~> 1.12.3)
     builder (3.2.2)
-    codeclimate-poseidon (0.0.8)
+    codeclimate-poseidon (0.0.12)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     crack (0.4.2)
@@ -92,4 +92,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   1.11.2
+   1.12.5
