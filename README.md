@@ -51,8 +51,6 @@ prevent duplicate processing.
 
 - `CC::Kafka.offset_model`
 
-  Must respond to `transaction(&block)`.
-
   Must respond to `find_for_create!(attributes)` and return an object that
   responds to `set(attributes)`.
 

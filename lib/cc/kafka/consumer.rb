@@ -95,16 +95,14 @@ module CC
           Kafka.statsd.time("messages.processing") do
             set_offset(message.offset + 1)
 
-            Kafka.offset_model.transaction do
-              data = BSON.deserialize(message.value)
-              data[MESSAGE_OFFSET_KEY] = [
-                @offset.topic,
-                @offset.partition,
-                message.offset,
-              ].join("-")
+            data = BSON.deserialize(message.value)
+            data[MESSAGE_OFFSET_KEY] = [
+              @offset.topic,
+              @offset.partition,
+              message.offset,
+            ].join("-")
 
-              @on_message.call(data)
-            end
+            @on_message.call(data)
           end
           Kafka.statsd.increment("messages.processed")
         end

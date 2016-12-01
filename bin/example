@@ -14,10 +14,6 @@ CC::Kafka.offset_model = Class.new do
     new(attrs)
   end
 
-  def self.transaction
-    yield
-  end
-
   def initialize(attrs)
     set(attrs)
   end
