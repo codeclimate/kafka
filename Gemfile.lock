@@ -11,7 +11,7 @@ GIT
 PATH
   remote: .
   specs:
-    codeclimate-kafka (0.9.1)
+    codeclimate-kafka (0.10.0)
       bson (~> 1.12.2)
       bson_ext (~> 1.12.2)
       codeclimate-poseidon (~> 0.0.12)
@@ -92,4 +92,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   1.12.5
+   1.13.1
