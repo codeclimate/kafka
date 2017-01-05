@@ -4,7 +4,7 @@ gemspec
 
 group :test do
   gem "dotenv"
-  gem "minidoc", "~> 0.0.1", github: "brynary/minidoc"
+  gem "minidoc"
   gem "rspec"
   gem "webmock"
 end
